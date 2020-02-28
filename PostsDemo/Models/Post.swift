@@ -13,4 +13,10 @@ struct Post: Decodable {
     var id: Int
     var title: String
     var body: String
+    
+    enum CodingKeys: String, CodingKey {
+        case userID = "userId"
+        case id, title, body
+    }
+    
 }

@@ -12,17 +12,34 @@ class PostsVC: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
-    var posts = [
-        Post(userID: 1, id: 1, title: "Title 1", body: "Body 1"),
-        Post(userID: 2, id: 2, title: "Title 2", body: "Body 2"),
-        Post(userID: 3, id: 3, title: "Title 3", body: "Body 3"),
-        Post(userID: 4, id: 4, title: "Title 4", body: "Body 4")
-    ]
+    var posts = [Post]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+        displayPosts()
+    }
+    
+    func displayPosts() {
+        
+        guard let url = URL(string: "https://jsonplaceholder.typicode.com/posts") else { return }
+        
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let data = data {
+                if let decodedPosts = try? JSONDecoder().decode([Post].self, from: data) {
+                    self.posts = decodedPosts
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                } else {
+                   debugPrint("Failure to decode posts.")
+               }
+            } else {
+                debugPrint("Failure to get data.")
+            }
+        }.resume()
+        
     }
 
 }
