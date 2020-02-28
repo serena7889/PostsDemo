@@ -14,10 +14,20 @@ class PostsVC: UIViewController {
     
     var posts = [Post]()
     
+    let activityIndicatorView = UIActivityIndicatorView(style: .large)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        activityIndicatorView.center = view.center
+        activityIndicatorView.startAnimating()
+        view.addSubview(activityIndicatorView)
+        tableView.isHidden = true
+        activityIndicatorView.isHidden = false
+        
         tableView.delegate = self
         tableView.dataSource = self
+        
         displayPosts()
     }
     
@@ -30,7 +40,10 @@ class PostsVC: UIViewController {
                 if let decodedPosts = try? JSONDecoder().decode([Post].self, from: data) {
                     self.posts = decodedPosts
                     DispatchQueue.main.async {
+                        self.activityIndicatorView.stopAnimating()
+                        self.activityIndicatorView.isHidden = true
                         self.tableView.reloadData()
+                        self.tableView.isHidden = false
                     }
                 } else {
                    debugPrint("Failure to decode posts.")
